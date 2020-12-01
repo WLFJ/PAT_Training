@@ -1,34 +1,45 @@
+// 注意模型遍历的时候，我们传递的是值还是tot
+// 能通过简单的办法解决，就不要想太多。
 #include <iostream>
 #include <cstdio>
+#include <set>
 using namespace std;
-int mem[100000];
+const int MAXN = 100000 + 10;
+int ver[MAXN], Next[MAXN], head[MAXN], tot;
+void addedge(int a, int b){
+    ver[++tot] = b, Next[tot] = head[a], head[a] = tot;
+}
 int main(void){
-    int a, b;int n;
+    int a, b, n;
     cin >> a >> b >> n;
-    mem[a] ++;
-    if(mem[b]){
-        printf("%05d\n", a);
+    while(n --){
+        int x; char z; int y;
+        cin >> x >> z >> y;
+        if(y == -1) continue;
+        addedge(x, y);
+    }
+    // 下面开始两个遍历 我们看看哪个最后分叉
+    set<int> mem;
+    mem.insert(a);
+    for(int i = head[a]; i; i = head[ver[i]]){
+        mem.insert(ver[i]);
+    }
+    int ans = -1;
+    if(mem.count(b)){
+        ans = b;
+        printf("%05d\n", ans);
         return 0;
     }
-    mem[b] ++;
-    int ans = -1;
-    int cc = 4;
-    while(n --){
-        int a, c;
-        char b;
-        cin >> a >> b >> c;
-        // 我们只要看哪个c出现两次就行了
-        if(mem[c]){
-            ans = c;
-            cc --;
-            if(!cc) break;
+    mem.insert(b);
+    for(int i = head[b]; i; i = head[ver[i]]){
+        if(mem.count(ver[i])){
+            ans = ver[i];
+            break;
         }else{
-            mem[c] ++;
+            mem.insert(ver[i]);
         }
     }
-    if(ans != -1)
-        printf("%05d\n", ans);
-    else
-        puts("-1");
+    if(ans == -1) cout << -1 << endl;
+    else printf("%05d\n", ans);
     return 0;
 }
